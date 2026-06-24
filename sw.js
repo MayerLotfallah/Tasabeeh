@@ -12,6 +12,7 @@ const ASSETS_TO_CACHE = [
   'playlist.html',
   'see-all-artistpage.html',
   'see-all-playlistpage.css',
+  'images/logo.png'
 ];
 
 self.addEventListener('install', (event) => {
