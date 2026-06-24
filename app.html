@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasabeeh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Estedad:wght@100..900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+    <nav class="main-navbar">
+        <div class="left-half">
+            <div class="logo"><a href="app.html"><img src="images/logo.png" alt="Logo"></a></div>
+            <div class="search-bar">
+                <div class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <input type="text" id="master-search-input" class="input-box" placeholder="Search for an artist or a channel...">
+                <div class="browse"><i class="fa-solid fa-folder"></i></div>
+            </div>
+        </div>
+
+        <div class="right-half">
+            <button id="auth-btn" class="login-btn">Log in</button>
+        </div>
+    </nav>
+
+    <iframe id="content-frame" src="home.html"></iframe>
+
+
+    <div class="music-player">
+        <div class="player-left">
+            <p id="current-playing-title">No Hymn Selected</p>
+            <p id="current-status">Ready for Playback..</p>
+        </div>
+
+        <div class="player-center">
+            <div class="controls">
+                <button id="repeat-btn" onclick="toggleRepeat()" title="Repeat"><i class="fa-solid fa-repeat"></i></button>
+                <button id="master-play-btn" onclick="togglePlayback()" title="Play / Pause"><i class="fa-solid fa-circle-play"></i></button>
+            </div>
+            
+            <div class="progress-area">
+                <span id="current-time">0:00</span>
+                <div class="progress-container" id="progress-container" onclick="seekVideo(event)">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <span id="total-time">0:00</span>
+            </div>
+        </div>
+        <div class="player-right"></div>
+    </div>
+
+    <div id="loginModal" class="login-modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Log in to Tasabih website</h3>
+            <input type="email" id="loginEmail" placeholder="Email Address">
+            <input type="password" id="loginPassword" placeholder="Password">
+        
+            <button id="modalSubmitBtn" onclick="handleAuthSubmit()">Log in</button>
+        
+            <p style="margin-top: 20px; font-size: 14px; color: #555;">
+                <span id="toggleText">Don't have an account?</span> 
+                <a href="#" id="toggleAuthModeLink" onclick="toggleAuthMode(event)" style="color: #0076a3; font-weight: bold; text-decoration: none;">Create New Account</a>
+            </p>
+        
+            <button class="close-btn" onclick="window.closeLoginModal()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="yt-hidden-player" style="width: 0px; height: 0px; overflow: hidden; position: absolute;"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        
+        const iframe = document.getElementById("content-frame");
+
+iframe.addEventListener("load", () => {
+    if (currentUser) {
+        setTimeout(() => {
+            loadUserPlaylists();
+        }, 100);
+    }
+});
+
+        let currentUser = null; let player; let isRepeat = false; let updateTimer; let currentMode = 'login';
+        let auth, db;
+
+        window.addEventListener("message", function(event) {
+            if(event.data.action === "showPlaylistSelector"){
+
+    if(!currentUser){
+        alert("Please login first");
+        return;
+    }
+
+    const hymn = event.data.hymn;
+
+    db.collection("playlists")
+      .where("userId","==",currentUser.uid)
+      .get()
+      .then(snapshot => {
+
+          const playlists = [];
+
+          let text = "Choose Playlist Number:\n\n";
+
+          snapshot.forEach(doc => {
+
+              playlists.push({
+                  id: doc.id,
+                  ...doc.data()
+              });
+
+              text += `${playlists.length}. ${doc.data().name}\n`;
+          });
+
+          if(playlists.length === 0){
+              alert("No playlists found.");
+              return;
+          }
+
+          const choice = parseInt(prompt(text));
+
+          if(
+              choice &&
+              choice > 0 &&
+              choice <= playlists.length
+          ){
+
+              addHymnToPlaylist(
+                  playlists[choice - 1].id,
+                  hymn
+              );
+
+              alert("Hymn added successfully!");
+          }
+
+      });
+}
+            if (event.data && event.data.action === 'triggerPlaylistCreation') {
+                setTimeout(() => {
+                    handleCreatePlaylist();
+                }, 100);
+            }
+
+            if (event.data && event.data.action === 'playHymn'){
+                executePlayHymn(event.data.title, event.data.id);
+            }
+        });
+
+        function handleCreatePlaylist(){
+            if (!currentUser) {
+                alert("Please log in to create a playlist.");
+                window.openLoginModal();
+                return;
+            }
+
+            let playlistName = prompt("Enter a name for your new playlist:");
+
+            if (playlistName && playlistName.trim() !== "") {
+                playlistName = playlistName.trim();
+
+                db.collection("playlists").add({
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    name: playlistName,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    hymns: []
+                })
+                .then(() => { alert("Playlist created successfully!");})
+                .catch((err) => { alert("Error creating playlist: " + err.message);
+                    console.error("Error creating playlist: ", err);
+                 });
+            }
+        }
+
+        function executePlayHymn(title, youtubeId) {
+            const titleElement = document.getElementById('current-playing-title');
+            const statusElement = document.getElementById('current-status');
+            if (titleElement) titleElement.innerText = title;
+            if (statusElement) statusElement.innerText = "Loading...";
+            if (player && typeof player.loadVideoById === 'function') { player.loadVideoById(youtubeId); player.playVideo(); }
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBrkhkRajDRN9oQOag9MDU3_O7E3auLjo",
+            authDomain: "tasabeh-1d64f.firebaseapp.com",
+            projectId: "tasabeh-1d64f",
+            storageBucket: "tasabeh-1d64f.firebasestorage.app",
+            messagingSenderId: "485379233044",
+            appId: "1:485379233044:web:e3988c7ce929c71f55e01"
+        };
+        firebase.initializeApp(firebaseConfig);
+        auth = firebase.auth(); db = firebase.firestore();
+
+        auth.onAuthStateChanged((user) => {
+            const statusText = document.getElementById('current-status');
+            const authBtn = document.getElementById('auth-btn');
+
+            if (user) { 
+                currentUser = user; 
+                statusText.innerText = "Welcome, " + user.email; 
+                if (authBtn) {
+                    authBtn.innerText = "Log out";
+                    authBtn.style.backgroundColor = "#d9534f"; 
+                }
+
+                loadUserPlaylists(); 
+            } 
+            else { 
+                currentUser = null; 
+                statusText.innerText = "Log in"; 
+                if (authBtn) {
+                    authBtn.innerText = "Log in";
+                    authBtn.style.backgroundColor = "#0076a3"; 
+                }
+
+                const sidebar = document.getElementById('sidebar-playlists');
+                if (sidebar) sidebar.innerHTML = "";
+            }
+        });
+
+        document.getElementById('auth-btn').addEventListener('click', function() {
+            if (currentUser) {
+                auth.signOut().then(() => {
+                    alert("You have been logged out!");
+                }).catch((err) => alert(err.message));
+            } else {
+                window.openLoginModal();
+            }
+        });
+
+        document.getElementById('master-search-input').addEventListener('input', function(e) {
+            const iframe = document.getElementById('content-frame');
+            if(iframe && iframe.contentWindow) { iframe.contentWindow.postMessage({ action: 'filterCards', query: e.target.value }, '*'); }
+        });
+
+        window.openLoginModal = function() {
+            currentMode = 'login';
+            document.getElementById('loginModal').style.display = 'flex';
+        };
+        window.closeLoginModal = function() { document.getElementById('loginModal').style.display = 'none'; };
+
+        function toggleAuthMode(event) {
+            if(event) event.preventDefault();
+            const modalTitle = document.getElementById('modalTitle');
+            const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+        if (currentMode === 'login') {
+
+            currentMode = 'signup';
+            modalTitle.innerText = "Create New Account in Tasabih";
+            modalSubmitBtn.innerText = "Sign Up";
+
+            toggleText.innerText = "Already have an account?";
+            toggleLink.innerText = "Log in now";
+
+        } else {
+
+            currentMode = 'login';
+            modalTitle.innerText = "Log in to Tasabih";
+            modalSubmitBtn.innerText = "Log in";
+
+            toggleText.innerText = "Don't have an account?";
+            toggleLink.innerText = "Create a New Account";
+        }
+        }
+
+        const toggleText = document.getElementById('toggleText');
+        const toggleLink = document.getElementById('toggleAuthModeLink');
+
+        function handleAuthSubmit() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value;
+            if (currentMode === 'login') {
+                auth.signInWithEmailAndPassword(email, pass).then(() => { window.closeLoginModal(); }).catch((err) => alert(err.message));
+            } else {
+                auth.createUserWithEmailAndPassword(email, pass).then(() => { window.closeLoginModal(); }).catch((err) => alert(err.message));
+            }
+        }
+
+        document.getElementById("loginEmail").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        handleAuthSubmit();
+    }
+});
+
+document.getElementById("loginPassword").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        handleAuthSubmit();
+    }
+});
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('yt-hidden-player', {
+                height: '0', width: '0', videoId: '',
+                playerVars: { 'controls': 0, 'disablekb': 1, 'rel': 0 },
+                events: { 'onStateChange': onPlayerStateChange }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            const playIcon = document.querySelector('#master-play-btn i');
+            if (event.data == YT.PlayerState.PLAYING) {
+                playIcon.className = "fa-solid fa-circle-pause"; startProgressLoop();
+            } else if (event.data == YT.PlayerState.PAUSED) {
+                playIcon.className = "fa-solid fa-circle-play"; clearInterval(updateTimer);
+            }
+        }
+
+function startProgressLoop() {
+
+    clearInterval(updateTimer);
+
+    updateTimer = setInterval(() => {
+
+        if (player && player.getCurrentTime) {
+
+            const current = player.getCurrentTime();
+            const duration = player.getDuration();
+
+            if(duration > 0){
+
+                const pct = (current / duration) * 100;
+
+                document.getElementById("progress-bar").style.width =
+                    pct + "%";
+
+                document.getElementById("current-time").textContent =
+                    formatTime(current);
+
+                document.getElementById("total-time").textContent =
+                    formatTime(duration);
+            }
+        }
+
+    }, 500);
+}
+
+function formatTime(seconds){
+
+    seconds = Math.floor(seconds);
+
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+
+    return mins + ":" + (secs < 10 ? "0" : "") + secs;
+}
+
+function seekVideo(event){
+
+    if(!player || !player.getDuration()) return;
+
+    const container =
+        document.getElementById("progress-container");
+
+    const rect =
+        container.getBoundingClientRect();
+
+    const clickX =
+        event.clientX - rect.left;
+
+    const percent =
+        clickX / rect.width;
+
+    const seekTime =
+        player.getDuration() * percent;
+
+    player.seekTo(seekTime, true);
+}
+
+        function togglePlayback() { if (player.getPlayerState() == YT.PlayerState.PLAYING) player.pauseVideo(); else player.playVideo(); }
+        function toggleRepeat() { isRepeat = !isRepeat; document.getElementById('repeat-btn').classList.toggle('active', isRepeat); }
+
+
+
+function loadUserPlaylists() {
+    if (!currentUser) return;
+
+    db.collection("playlists")
+      .where("userId", "==", currentUser.uid)
+      .onSnapshot((snapshot) => {
+
+        const iframe = document.getElementById("content-frame");
+
+        if (!iframe.contentWindow) return;
+
+        const sidebar =
+            iframe.contentWindow.document.getElementById("sidebar-playlists");
+
+        if (!sidebar) return;
+
+        sidebar.innerHTML = "";
+
+        snapshot.forEach((doc) => {
+            const playlist = doc.data();
+
+            const div = document.createElement("div");
+            div.className = "playlist-item";
+            div.textContent = playlist.name;
+
+            div.onclick = () => {
+                document.getElementById("content-frame").src = `playlist.html?id=${doc.id}`;
+            }
+            sidebar.appendChild(div);
+        });
+    });
+}
+
+function addHymnToPlaylist(playlistId, hymnData) {
+    db.collection("playlists").doc(playlistId).update({
+        hymns: firebase.firestore.FieldValue.arrayUnion(hymnData)
+    })
+    .then(() => alert("Hymn added to playlist!"))
+    .catch((err) => alert("Error: " + err.message));
+}
+
+    </script>
+</body>
+</html>

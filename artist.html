@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasabeeh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Estedad:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="artist.css?v=1.0">
+</head>
+<body>
+
+
+
+<div class="sidebar">
+    <div class="nav">
+        <span class="library-title">Your Library</span>
+        <button class="badge" onclick="requestNewPlaylist()" title="Create a new playlist.">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+    </div>
+
+    <div id="sidebar-playlists"></div>
+</div>
+
+    <div class="main-content" style="padding-bottom: 120px;">
+        <div class="artist-profile-container" style="padding: 20px; display: flex; justify-content: space-between; align-items: flex-start; width: 100%; box-sizing: border-box; gap: 40px;">
+            
+            <div class="artist-left-side" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 5px; flex-shrink: 0;">
+                <img id="main-artist-img" src="" alt="Artist Image" style="width: 190px; height: 190px; border-radius: 50%; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
+                <h1 id="main-artist-name" style="font-size: 32px; margin: 10px 0 0 0; color: #000000; font-weight: bold; line-height: 1.1;">Name</h1>
+                <a href="#" style="color: #b3b3b3; margin: -2px 0 0 0; font-size: 16px; text-decoration: none;">Official Page</a>
+            </div>
+            
+            <div class="artist-right-side" style="display: flex; flex-direction: column; flex-grow: 1; padding-top: 15px; padding-right: 20px;">
+
+                <table class="tracks-table" style="width: 100%; border-collapse: collapse; font-family: 'Estedad', sans-serif;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid rgba(0,0,0,0.08); font-size: 14px; text-align: left;">
+                            <th id="artist-title" style="padding: 10px 0; color: #000000; font-size: 20px; font-weight: bold;">Popular Hymns:</th>
+                            <th style="padding: 10px; text-align: right; width: 80px; color: #6a6a6a;"><i class="fa-regular fa-clock"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="track-row">
+                            <td style="padding: 14px 10px; font-weight: 500; color: #000000;">
+                                <span style="color: #6a6a6a; margin-right: 15px; display: inline-block; width: 20px; text-align: center;">1</span>
+                                <span id="track-title-1">Loading...</span>
+                            </td>
+                            <td id="track-time-1" style="padding: 14px 10px; text-align: right; color: #6a6a6a;">--:--</td>
+                        </tr>
+                        <tr class="track-row">
+                            <td style="padding: 14px 10px; font-weight: 500; color: #000000;">
+                                <span style="color: #6a6a6a; margin-right: 15px; display: inline-block; width: 20px; text-align: center;">2</span>
+                                <span id="track-title-2">Loading...</span>
+                            </td>
+                            <td id="track-time-2" style="padding: 14px 10px; text-align: right; color: #6a6a6a;">--:--</td>
+                        </tr>
+                        <tr class="track-row">
+                            <td style="padding: 14px 10px; font-weight: 500; color: #000000;">
+                                <span style="color: #6a6a6a; margin-right: 15px; display: inline-block; width: 20px; text-align: center;">3</span>
+                                <span id="track-title-3">Loading...</span>
+                            </td>
+                            <td id="track-time-3" style="padding: 14px 10px; text-align: right; color: #6a6a6a;">--:--</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const allArtistsHymns = {
+            "CTV Egypt": [
+                { title: "جدو كيرلس", duration: "4:16", plays: 1300000, youtubeId: "VTRUXboyER8" },
+                { title: "جيتلك وأنا مديون", duration: "3:52", plays: 882000, youtubeId: "QIKsEgYQSnE" },
+                { title: "يسوع في السفينة", duration: "4:41", plays: 664000, youtubeId: "ZkT3wawRO6o" },
+                { title: "مديح أمدح في البتول", duration: "17:08", plays: 538000, youtubeId: "KJV59ZwcT8k" }
+            ],
+            "David's Heart Team": [
+                { title: "أصليله", duration: "5:44", plays: 25000000, youtubeId: "aibvA9JTl1A" },
+                { title: "الهنا عظيم", duration: "5:00", plays: 5700000, youtubeId: "KKFheKgTJe0" },
+                { title: "محلاكي يا مريم", duration: "3:33", plays: 688000, youtubeId: "_zN9vmZK7jA" }
+            ],
+            "Aghapy choir": [
+                { title: "علشان خاطر العدرا يارب", duration: "4:44", plays: 11000000, youtubeId: "rJSKuux7NOk" },
+                { title: "ست البنات", duration: "7:33", plays: 1500000, youtubeId: "NPKcyuYGhYA" },
+                { title: "إله المعجزات", duration: "5:52", plays: 756000, youtubeId: "Zmk5vgbSDRY" }
+            ],
+            "Ava Rewase choir": [
+                { title: "امسك يارب ايدي", duration: "6:18", plays: 8400000, youtubeId: "PcS-9LS0XZI" },
+                { title: "ما احلى ساعة الصلاه", duration: "4:29", plays: 192000, youtubeId: "h9mpYEyynvo" },
+                { title: "الرب لي راعي", duration: "3:21", plays: 71000, youtubeId: "5IQd7hd0wbc" }
+            ],
+            "AghapyTV": [
+                { title: "سامحنا يا فادينا", duration: "7:23", plays: 147517, youtubeId: "tfcs7y_2PC4" },
+                { title: "مديح السجود يليق بالثالوث", duration: "7:08", plays: 112935, youtubeId: "PODUiMJvoWY" },
+                { title: "مديح مراحمك يا الهي", duration: "4:45", plays: 103263, youtubeId: "LnZbBKqGsmA" }
+            ],
+            "Boles Malak": [
+                { title: "مديح السلام لك يامريم", duration: "5:15", plays: 1900000, youtubeId: "VazZ0utFv5c" },
+                { title: "أمنا يا عدرا", duration: "4:33", plays: 638000, youtubeId: "G2hOCFwh_sU" },
+                { title: "تمجيد الملاك الجليل رافائيل", duration: "5:45", plays: 636000, youtubeId: "sPP3e6GIlK0" }
+            ],
+            "Haidy Montasser": [
+                { title: "مابتكسفنيش", duration: "3:30", plays: 3096841, youtubeId: "3YqFyYIqldY" },
+                { title: "بتتصرف", duration: "5:04", plays: 2500772, youtubeId: "mvISJunD50s" },
+                { title: "سيد مملكتنا", duration: "3:55", plays: 1786577, youtubeId: "Cd0WeUQYALg" }
+            ],
+            "Mariam Helmy": [
+                { title: "أمانة يا عدرا", duration: "4:22", plays: 585655, youtubeId: "FoDC4AzWZmY" },
+                { title: "سلمت نفسي في يديك", duration: "3:30", plays: 290273, youtubeId: "E7TsLTSOk-0" },
+                { title: "ما با اعولش الهم", duration: "4:47", plays: 203625, youtubeId: "B43AU2bvU70" }
+            ],
+            "Youstina Samir": [
+                { title: "مر وتعالي", duration: "4:15", plays: 4459317, youtubeId: "i3dZispsGuo" },
+                { title: "شالله يا عدرا", duration: "3:11", plays: 3588144, youtubeId: "RsWsYDtoCcs" },
+                { title: "يا سائح للقاء يسوع", duration: "5:20", plays: 3400635, youtubeId: "Z1vnCumh_qk" }
+            ],
+            "The Savior Team": [
+                { title: "مش قصة وخلاص", duration: "5:26", plays: 2728809, youtubeId: "axpKKkx07CY" },
+                { title: "فاض على الأرض", duration: "4:20", plays: 962604, youtubeId: "Uy2cQ1bzFRo" },
+                { title: "نزل من السماء إلي الأرض", duration: "3:50", plays: 784780, youtubeId: "khmrxKj1r70" }
+            ]
+        };
+
+        let currentHymns = [];
+
+function addToPlaylist(songIndex) {
+
+    const hymn = currentHymns[songIndex];
+
+    if (!window.parent) return;
+
+    window.parent.postMessage({
+        action: "showPlaylistSelector",
+        hymn: hymn
+    }, "*");
+}
+
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            let nameFromUrl = params.get('name'); 
+
+            if (nameFromUrl) {
+                nameFromUrl = decodeURIComponent(nameFromUrl.replace(/\+/g, ' ')).trim();
+
+                const nameElement = document.getElementById('main-artist-name');
+                const imgTarget = document.getElementById('main-artist-img');
+
+                if (nameElement) nameElement.innerText = nameFromUrl;
+
+                if (imgTarget) {
+                    if (nameFromUrl === "CTV Egypt") imgTarget.src = "https://yt3.googleusercontent.com/2AEQ1z6hBSd9JdYZQlOtvfJzuxzwo0CCfPA5FcKDbxVm-iSq2yZLcxMnuAwJA9YSM-4ifAlLtvA=w544-c-h544-k-c0x00ffffff-no-l90-rj";
+                    else if (nameFromUrl === "David's Heart Team") imgTarget.src = "https://yt3.googleusercontent.com/ytc/AIdro_mD2iPvo568nXa7KXe1U1N6JG7NV00uqvmsdnAF3t_wns8=s900-c-k-c0x00ffffff-no-rj";
+                    else if (nameFromUrl === "Aghapy choir") imgTarget.src = "https://i1.sndcdn.com/artworks-tgx42HmMk7B9dIUT-sgRarw-t500x500.jpg";
+                    else if (nameFromUrl === "Ava Rewase choir") imgTarget.src = "https://yt3.googleusercontent.com/WIfVnLld-1ktJ07yJHUsjAv_z_Gxmz0D480BMfw-DPaV4E4Nm-HgsAciFvuPHzS03Atiha4V1uY=s900-c-k-c0x00ffffff-no-rj";
+                    else if (nameFromUrl === "AghapyTV") imgTarget.src = "https://biblelogic.net/en/iLoghosNewGen/img/stream/sender/aghapytv.png";
+                    else if (nameFromUrl === "Boles Malak") imgTarget.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8_kY8jYcIMChJAc7XpIQJeS1wWdu_Lh_3Pg&s";
+                    else if (nameFromUrl === "Haidy Montasser") imgTarget.src = "https://yt3.googleusercontent.com/t-nRHq6f65b7Na54-elidfyeNyQDIQFtbSLtVltj9fE0tC5UaFqKchBAVGogPePSgAEm4ho7FQ=s160-c-k-c0x00ffffff-no-rj";
+                    else if (nameFromUrl === "Mariam Helmy") imgTarget.src = "https://viberate-upload.ams3.cdn.digitaloceanspaces.com/prod/entity/artist/mariam-helmy-9xy98";
+                    else if (nameFromUrl === "Youstina Samir") imgTarget.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0_MaIuiJe1tS4Vk4sDC2AiJJMoDeUCVIvow&s";
+                    else if (nameFromUrl === "The Savior Team") imgTarget.src = "https://i1.sndcdn.com/artworks-000076757597-gm0c8k-t240x240.jpg";
+                }
+
+                currentHymns = allArtistsHymns[nameFromUrl];
+                if (!currentHymns) {
+                    currentHymns = allArtistsHymns[Object.keys(allArtistsHymns).find(key => key.trim() === nameFromUrl)];
+                }
+
+                if (currentHymns && currentHymns.length > 0) {
+                    currentHymns.sort((a, b) => b.plays - a.plays);
+
+                    const rows = document.querySelectorAll('.track-row');
+                    rows.forEach((row, i) => {
+                        if (currentHymns[i]) {
+                            document.getElementById(`track-title-${i+1}`).innerHTML =
+                            `
+                            ${currentHymns[i].title}
+                            <button class="playlist-add-btn"
+                            onclick="event.stopPropagation(); addToPlaylist(${i})">
+                            <i class="fa-solid fa-plus"></i>
+                            </button>
+                            `;
+                            document.getElementById(`track-time-${i+1}`).innerText =
+                            currentHymns[i].duration;
+                            
+                            row.style.cursor = "pointer";
+                            
+                            row.onclick = function() {
+                                if (window.parent) {
+                                    window.parent.postMessage({
+                                        action: 'playHymn',
+                                        title: currentHymns[i].title,
+                                        id: currentHymns[i].youtubeId
+                                    }, '*');
+                                    console.log("Hymn play signal sent to the parent:", currentHymns[i].title);
+                                } else {
+                                    console.log("Main player (the parent page) is not available");
+                                }
+                            };
+                        }
+                    });
+                }
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.querySelector(".search-bar input");
+            const hymnRows = document.querySelectorAll(".track-row");
+
+            if (searchInput) {
+                searchInput.addEventListener("input", function(e) {
+                    const query = e.target.value.toLowerCase().trim();
+                    
+                    hymnRows.forEach(row => {
+                        const text = row.textContent ? row.textContent.toLowerCase() : "";
+                        if (text.includes(query)) {
+                            row.style.setProperty("display", "", "important");
+                        } else {
+                            row.style.setProperty("display", "none", "important");
+                        }
+                    });
+                });
+            }
+        });
+
+
+
+        function requestNewPlaylist() {
+            window.parent.postMessage({ action: 'triggerPlaylistCreation' }, '*');
+        }
+
+
+        window.addEventListener("message", function(event){
+
+    if(event.data.action !== "filterCards") return;
+
+    const query =
+        event.data.query.toLowerCase().trim();
+
+    const rows =
+        document.querySelectorAll(".track-row");
+
+    rows.forEach(row => {
+
+        const text =
+            row.textContent.toLowerCase();
+
+        row.style.display =
+            text.includes(query)
+            ? ""
+            : "none";
+    });
+
+});
+
+    </script>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>

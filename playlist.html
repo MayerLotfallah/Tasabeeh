@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playlist</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+<body>
+<style>
+body{
+    margin:0;
+    padding:30px;
+    font-family:Arial,sans-serif;
+    background: whitesmoke;
+    color:black;
+    font-family: "Estedad", sans-serif;
+}
+
+.playlist-header{
+    position: sticky;
+    top:0;
+    padding:20px;
+    background: whitesmoke;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.playlist-name{
+    font-size:36px;
+    font-weight:bold;
+}
+
+.buttons{
+    display:flex;
+    gap:10px;
+}
+
+button{
+    border:none;
+    border-radius:8px;
+    padding:10px 15px;
+    cursor:pointer;
+}
+
+.rename-btn{
+    background:#1db954;
+    color:white;
+}
+
+.delete-btn{
+    background:#d9534f;
+    color:white;
+}
+
+.play-btn{
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: #1db954;
+    color: white;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: .2s;
+}
+
+.play-btn:hover{
+    transform: scale(1.1);
+}
+
+.song-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.song-item{
+    background:white;
+    border-radius:10px;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.song-info{
+    display:flex;
+    flex-direction:column;
+}
+
+.song-title{
+    font-size:18px;
+}
+
+.song-duration{
+    color:#b3b3b3;
+    font-size:14px;
+}
+
+.remove-song{
+    background:#d9534f;
+    color:white;
+}
+</style>
+
+    
+    <div class="playlist-header">
+    <div id="playlist-name" class="playlist-name">
+        Loading...
+    </div><div class="buttons">
+    <button class="rename-btn" onclick="renamePlaylist()">
+        Rename
+    </button>
+
+    <button class="delete-btn" onclick="deletePlaylist()">
+        Delete
+    </button>
+</div>
+
+</div>
+    <div id="song-list" class="song-list">
+</div>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"> 
+</script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js">
+</script>
+    <script>
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCBrkhkRajDRN9oQOag9MDU3_O7E3auLjo",
+    authDomain: "tasabeh-1d64f.firebaseapp.com",
+    projectId: "tasabeh-1d64f",
+    storageBucket: "tasabeh-1d64f.firebasestorage.app",
+    messagingSenderId: "485379233044",
+    appId: "1:485379233044:web:e3988c7ce929c71f55e01"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+
+const params = new URLSearchParams(window.location.search);
+const playlistId = params.get("id");
+
+let playlistData = null;
+
+function loadPlaylist(){
+
+    db.collection("playlists")
+      .doc(playlistId)
+      .onSnapshot((doc)=>{
+
+        if(!doc.exists){
+            document.body.innerHTML =
+                "<h1>Playlist not found</h1>";
+            return;
+        }
+
+        playlistData = doc.data();
+
+        document.getElementById("playlist-name")
+                .textContent = playlistData.name;
+
+        const songList =
+            document.getElementById("song-list");
+
+        songList.innerHTML = "";
+
+        const hymns = playlistData.hymns || [];
+
+        hymns.forEach((song,index)=>{
+
+            const div =
+                document.createElement("div");
+
+            div.className = "song-item";
+
+div.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;">
+
+        <button
+            class="play-btn"
+            onclick="playHymnFromPlaylist(
+                '${song.title}',
+                '${song.youtubeId}'
+            )">
+            <i class="fa-solid fa-play"></i>
+        </button>
+
+        <div class="song-info">
+            <div class="song-title">
+                ${song.title}
+            </div>
+
+            <div class="song-duration">
+                ${song.duration || ""}
+            </div>
+        </div>
+
+    </div>
+
+    <button
+        class="remove-song"
+        onclick="removeSong(${index})">
+        Remove
+    </button>
+`;
+
+            songList.appendChild(div);
+        });
+
+      });
+
+}
+
+function renamePlaylist(){
+
+    const newName =
+        prompt("New playlist name");
+
+    if(!newName) return;
+
+    db.collection("playlists")
+      .doc(playlistId)
+      .update({
+          name:newName
+      });
+
+}
+
+function deletePlaylist(){
+
+    if(!confirm("Delete playlist permanently?"))
+        return;
+
+    db.collection("playlists")
+      .doc(playlistId)
+      .delete()
+      .then(()=>{
+
+          if(window.parent){
+              window.parent.document
+                .getElementById("content-frame")
+                .src = "index.html";
+          }
+
+      });
+
+}
+
+function removeSong(index){
+
+    const hymns =
+        [...playlistData.hymns];
+
+    hymns.splice(index,1);
+
+    db.collection("playlists")
+      .doc(playlistId)
+      .update({
+          hymns:hymns
+      });
+
+}
+
+loadPlaylist();
+
+function playHymnFromPlaylist(title, youtubeId) {
+    window.parent.postMessage({
+        action: 'playHymn',
+        title: title,
+        id: youtubeId
+    }, '*');
+}
+
+
+window.addEventListener("message", (event) => {
+
+    if(event.data.action !== "filterCards") return;
+
+    const query =
+        event.data.query.toLowerCase().trim();
+
+    const songs =
+        document.querySelectorAll(".song-item");
+
+    songs.forEach(song => {
+
+        const title =
+            song.querySelector(".song-title")
+                .textContent
+                .toLowerCase();
+
+        song.style.display =
+            title.includes(query)
+            ? ""
+            : "none";
+    });
+
+});
+
+</script>
+</body>
+</head>
+</html>

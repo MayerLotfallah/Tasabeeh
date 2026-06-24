@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasabeeh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Estedad:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="see-all-artistspage.css">
+</head>
+<body>
+
+
+
+<div class="sidebar">
+    <div class="nav">
+        <span class="library-title">Your Library</span>
+        <button class="badge" onclick="requestNewPlaylist()" title="Create a new playlist.">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+    </div>
+
+    <div id="sidebar-playlists"></div>
+</div>
+
+    <div class="music-player"></div>
+
+    <div class="main-content">
+        <p class="welcome-message">That's all for now!</p>
+        </div>
+    </div>
+
+
+
+    <script>
+
+                function requestNewPlaylist() {
+            window.parent.postMessage({ action: 'triggerPlaylistCreation' }, '*');
+        }
+        
+    </script>
+</body>
+</html>

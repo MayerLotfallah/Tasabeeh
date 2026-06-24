@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasabeeh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Estedad:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=999">
+</head>
+<body style="padding-top: 0; margin: 0; background: transparent;">
+
+<div class="sidebar">
+    <div class="nav">
+        <span class="library-title">Your Library</span>
+        <button class="badge" onclick="requestNewPlaylist()" title="Create a new playlist.">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+    </div>
+
+    <div id="sidebar-playlists"></div>
+</div>
+
+    <div class="main-content" style="padding-top: 20px;">
+        <span>Artists and Channels</span>
+        <div class="card-container">
+            <a href="artist.html?name=CTV+Egypt" class="card">
+                <div class="img-container">
+                    <img src="https://copticorthodox.church/wp-content/uploads/2021/02/enti-12.png" alt="CTV Egypt">
+                    <div class="img-overlay"><span>Channel</span></div>
+                </div>
+                <h3>CTV Egypt</h3>
+            </a>
+
+            <a href="artist.html?name=David's+Heart+Team" class="card">
+                <div class="img-container">
+                    <img src="https://yt3.googleusercontent.com/ytc/AIdro_mD2iPvo568nXa7KXe1U1N6JG7NV00uqvmsdnAF3t_wns8=s900-c-k-c0x00ffffff-no-rj" alt="David's Heart Team">
+                    <div class="img-overlay"><span>Artist</span></div>
+                </div>
+                <h3>David's Heart Team</h3>
+            </a>
+
+            <a href="artist.html?name=Aghapy+choir" class="card">
+                <div class="img-container">
+                    <img src="https://i1.sndcdn.com/artworks-tgx42HmMk7B9dIUT-sgRarw-t500x500.jpg" alt="Aghapy choir">
+                    <div class="img-overlay"><span>Artist</span></div>
+                </div>
+                <h3>Aghapy choir</h3>
+            </a>
+
+            <a href="artist.html?name=Ava+Rewase+choir" class="card">
+                <div class="img-container">
+                    <img src="https://yt3.googleusercontent.com/WIfVnLld-1ktJ07yJHUsjAv_z_Gxmz0D480BMfw-DPaV4E4Nm-HgsAciFvuPHzS03Atiha4V1uY=s900-c-k-c0x00ffffff-no-rj" alt="Ava Rewase choir">
+                    <div class="img-overlay"><span>Artist</span></div>
+                </div>
+                <h3>Ava Rewase choir</h3>
+            </a>
+
+            <a href="artist.html?name=AghapyTV" class="card">
+                <div class="img-container">
+                    <img src="https://biblelogic.net/en/iLoghosNewGen/img/stream/sender/aghapytv.png" alt="AghapyTV">
+                    <div class="img-overlay"><span>Channel</span></div>
+                </div>
+                <h3>AghapyTV</h3>
+            </a>
+
+            <a href="artist.html?name=Boles+Malak" class="card">
+                <div class="img-container">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8_kY8jYcIMChJAc7XpIQJeS1wWdu_Lh_3Pg&s" alt="Boles Malak">
+                    <div class="img-overlay"><span>Artist</span></div>
+                </div>
+                <h3>Boles Malak</h3>
+            </a>
+
+            <a href="artist.html?name=Haidy+Montasser" class="card">
+                <div class="img-container">
+                    <img src="https://yt3.googleusercontent.com/t-nRHq6f65b7Na54-elidfyeNyQDIQFtbSLtVltj9fE0tC5UaFqKchBAVGogPePSgAEm4ho7FQ=s160-c-k-c0x00ffffff-no-rj" alt="Haidy Montasser">
+                    <div class="img-overlay"><span>Artist</span></div>
+                </div>
+                <h3>Haidy Montasser</h3>
+            </a>
+
+            <a href="artist.html?name=Mariam+Helmy" class="card">
+                <div class="img-container">
+                    <img src="https://viberate-upload.ams3.cdn.digitaloceanspaces.com/prod/entity/artist/mariam-helmy-9xy98" alt="Mariam Helmy">
+                    <div class="img-overlay"><span>Artist</span></div>
+                </div>
+                <h3>Mariam Helmy</h3>
+            </a>
+
+            <a href="artist.html?name=Youstina+Samir" class="card">
+                <div class="img-container">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0_MaIuiJe1tS4Vk4sDC2AiJJMoDeUCVIvow&s" alt="Youstina Samir">
+                    <div class="img-overlay"><span>Artist</span></div>
+                </div>
+                <h3>Youstina Samir</h3>
+            </a>
+
+            <a href="artist.html?name=The+Savior+Team" class="card">
+                <div class="img-container">
+                    <img src="https://i1.sndcdn.com/artworks-000076757597-gm0c8k-t240x240.jpg" alt="The Savior Team">
+                    <div class="img-overlay"><span>Artist</span></div>
+                </div>
+                <h3>The Savior Team</h3>
+            </a>
+
+            <a href="See-all-artistspage.html" class="card see-all-card">
+                <div class="see-all-circle"><span>See All</span></div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const container = document.querySelector('.card-container');
+        if (container) { container.addEventListener('wheel', (e) => { e.preventDefault(); container.scrollLeft += e.deltaY; }); }
+
+        window.addEventListener("message", function(event) {
+            if (event.data && event.data.action === 'filterCards') {
+                const query = event.data.query.toLowerCase().trim();
+                const cards = document.querySelectorAll(".card-container .card:not(.see-all-card)");
+                cards.forEach(card => {
+                    const name = card.querySelector("h3") ? card.querySelector("h3").textContent.toLowerCase() : "";
+                    card.style.display = name.includes(query) ? "" : "none";
+                });
+                const seeAll = document.querySelector(".see-all-card");
+                if (seeAll) seeAll.style.display = query === "" ? "" : "none";
+            }
+        });
+
+
+        function requestNewPlaylist() {
+            window.parent.postMessage({ action: 'triggerPlaylistCreation' }, '*');
+        }
+
+
+        function openPage(page) {
+    window.parent.document
+        .getElementById("content-frame")
+        .src = page;
+}
+
+document.querySelectorAll(".card[href]").forEach(card => {
+    const href = card.getAttribute("href");
+
+    if (
+        href &&
+        href !== "#" &&
+        !href.startsWith("http") &&
+        !href.startsWith("javascript:")
+    ) {
+        card.addEventListener("click", function(e) {
+            e.preventDefault();
+            openPage(href);
+        });
+    }
+});
+    </script>
+</body>
+</html>
