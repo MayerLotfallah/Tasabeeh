@@ -12,7 +12,7 @@ const ASSETS_TO_CACHE = [
   'playlist.html',
   'see-all-artistpage.html',
   'see-all-playlistpage.css',
-  'images/logo.png'
+  'D:\Mayer\مهرجان الكرازة 2026\Hymns Web App 2\images\logo.png',
 ];
 
 self.addEventListener('install', (event) => {
